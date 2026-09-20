@@ -20,7 +20,9 @@ démonstration et `/api/generate` répond une 503 explicite.
 | `npm run build` | build de production (valide aussi les types) |
 | `npm run typecheck` | `tsc --noEmit` seul |
 | `npm run lint` | ESLint |
-| `npm run shots` | captures 1440/390 px + contrôle débordement et console (serveur de dev requis) |
+| `npm test` | suite Playwright, desktop et mobile |
+| `npm run test:ui` | la même en mode interactif |
+| `npm run shots` | captures pleine page dans `.screenshots/` |
 
 ## L'idée centrale : le modèle ne produit pas de code
 
@@ -70,7 +72,34 @@ src/
     generator.tsx  le formulaire (composant client)
     exemple/       rendu du spec de démonstration, sans appel de modèle
     api/generate/  POST { brief } → { spec }
+
+tests/
+  helpers.ts       neutralisation des polices distantes, collecte d'erreurs
+  render.spec.ts   le moteur de rendu sur /exemple
+  generator.spec.ts  l'UI de l'outil, API simulée
+  api.spec.ts      les chemins d'erreur de /api/generate
+  capture.spec.ts  captures pleine page, pour l'œil (`npm run shots`)
 ```
+
+### Les tests
+
+`npm test` lance la suite sur deux projets, desktop et mobile : le moteur de
+rendu compose différemment aux deux tailles et la plupart des défauts
+n'apparaissent que dans l'une. Playwright démarre le serveur de développement
+lui-même, ou réutilise celui qui tourne déjà.
+
+Deux choix qui gardent la suite déterministe :
+
+- **Aucun test ne déclenche de vraie génération.** Ça coûterait un appel de
+  modèle par exécution et le résultat varierait. `/api/generate` est simulé là
+  où l'interface doit en faire quelque chose ; seuls ses chemins d'erreur sont
+  testés en vrai, et ce sont eux qui comptent — un générateur qui échoue en
+  silence est pire qu'un générateur qui échoue.
+- **Les polices Google sont interceptées.** La latence d'un CDN tiers, sa
+  disponibilité ou un proxy d'entreprise décideraient sinon du résultat.
+
+Les assertions transverses sont l'absence de débordement horizontal et
+l'absence d'erreur console, vérifiées sur chaque page et à chaque taille.
 
 ### Pourquoi deux schémas
 

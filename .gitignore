@@ -45,3 +45,11 @@ next-env.d.ts
 
 # Captures de vérification navigateur
 /.screenshots/
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

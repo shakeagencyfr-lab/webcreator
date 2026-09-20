@@ -97,19 +97,23 @@ conteneurs qui en embarquent déjà un —, pointe l'exécutable explicitement :
 
 ### Vérification navigateur sans MCP
 
-Le MCP Playwright n'est pas indispensable : `npm run shots` fait le contrôle
-que `/design` et `/polish` demandent, et n'a besoin d'aucun connecteur.
+Le MCP Playwright n'est pas indispensable : le projet embarque le runner
+Playwright, qui fait le contrôle que `/design` et `/polish` demandent sans
+aucun connecteur.
 
 ```bash
-npm run dev          # dans un terminal
-npm run shots        # dans un autre
+npm test             # assertions, desktop et mobile
+npm run shots        # captures pleine page dans .screenshots/
 ```
 
-Il capture chaque page en 1440 et 390 px dans `.screenshots/`, et signale les
-débordements horizontaux et les erreurs console — ce qu'une capture seule ne
-montre pas. Il sort en code 1 si quelque chose cloche, donc il s'intègre à une
-CI. Il utilise `PLAYWRIGHT_EXECUTABLE_PATH` s'il est défini, sinon le Chromium
-de l'image, sinon celui de Playwright.
+Playwright démarre le serveur de développement lui-même. `npm test` vérifie
+notamment ce qu'une capture ne montre pas : débordement horizontal et erreurs
+console, sur chaque page et à chaque taille.
+
+Le navigateur est résolu via `PLAYWRIGHT_EXECUTABLE_PATH`, sinon le Chromium
+déjà présent dans l'image, sinon celui que Playwright a téléchargé — sans ce
+repli, un conteneur dont le Chromium ne correspond pas à la version attendue
+échoue en réclamant `npx playwright install`.
 
 ## Premier run
 

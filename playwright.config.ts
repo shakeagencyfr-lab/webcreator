@@ -45,8 +45,14 @@ export default defineConfig({
     { name: "mobile", use: { ...devices["Pixel 5"] } },
   ],
 
+  /*
+    En local on teste le serveur de développement, déjà lancé la plupart du
+    temps. En CI on teste le build de production : c'est ce qui sera déployé,
+    et certaines erreurs ne se manifestent qu'après build. Le workflow lance
+    `npm run build` avant la suite.
+  */
   webServer: {
-    command: "npm run dev",
+    command: process.env.CI ? "npm run start" : "npm run dev",
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

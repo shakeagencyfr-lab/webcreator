@@ -101,6 +101,17 @@ Deux choix qui gardent la suite déterministe :
 Les assertions transverses sont l'absence de débordement horizontal et
 l'absence d'erreur console, vérifiées sur chaque page et à chaque taille.
 
+En local, Playwright sert le serveur de développement. En CI il sert le
+**build de production** : c'est ce qui sera déployé, et certaines erreurs ne se
+manifestent qu'après build.
+
+### CI
+
+`.github/workflows/ci.yml` enchaîne lint, types, build, puis la suite, à
+chaque poussée sur `main` ou `claude/**` et sur chaque pull request. En cas
+d'échec, le rapport Playwright est conservé en artefact sept jours — il porte
+les captures et les traces, un log seul ne suffit pas à diagnostiquer.
+
 ### Pourquoi deux schémas
 
 `lib/site/schema.ts` est strict : union discriminée sur le type de section,

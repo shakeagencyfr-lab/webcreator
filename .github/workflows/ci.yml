@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "claude/**"]
+  pull_request:
+
+# Une poussée annule la vérification de la précédente sur la même branche :
+# seul l'état actuel de la branche intéresse quelqu'un.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Types
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      # Les runners GitHub n'embarquent aucun navigateur utilisable par
+      # Playwright. Seul Chromium est installé : la suite ne cible que lui.
+      - name: Installer Chromium
+        run: npx playwright install --with-deps chromium
+
+      # `npm run build` vient de tourner : en CI, playwright.config.ts sert le
+      # build de production plutôt que le serveur de développement.
+      - name: Tests
+        run: npm test
+
+      # Sans ça, un échec ne laisse qu'un log : le rapport porte les captures,
+      # les traces et le détail de chaque assertion.
+      - name: Conserver le rapport en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

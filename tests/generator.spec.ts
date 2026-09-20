@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { MINIMAL_SPEC, createSite } from "./fixtures";
 import { blockWebFonts, collectPageErrors, horizontalOverflow } from "./helpers";
 
 /**
@@ -67,56 +68,31 @@ test.describe("générateur", () => {
     await expect(alert).toContainText("ANTHROPIC_API_KEY");
   });
 
-  test("bascule sur l'aperçu puis revient au formulaire", async ({ page }) => {
-    await page.route("**/api/generate", async (route) => {
-      // Le spec minimal que le schéma accepte : un header et un hero.
-      const spec = {
-        name: "Torréfaction Bastide",
-        tagline: "Café de spécialité à Bordeaux",
-        lang: "fr",
-        theme: {
-          fontPairing: "editorial",
-          radius: "sm",
-          density: "regular",
-          colors: {
-            bg: "#FBF9F6",
-            surface: "#F2EEE7",
-            text: "#1A1714",
-            muted: "#5F574E",
-            border: "#DFD8CD",
-            primary: "#1A1714",
-            primaryText: "#FBF9F6",
-            accent: "#C2410C",
-          },
-        },
-        sections: [
-          { type: "header", brand: "Bastide", links: [], cta: null },
-          {
-            type: "hero",
-            title: "Torréfié à Bordeaux, livré sous 48 heures.",
-            subtitle: null,
-            primaryCta: null,
-            secondaryCta: null,
-          },
-        ],
-      };
-      await route.fulfill({
-        status: 200,
+  test("redirige vers l'éditeur du site généré", async ({ page, request }) => {
+    // Un vrai site est créé, puis la génération est simulée pour renvoyer son
+    // identifiant : on teste la redirection et le chargement de l'éditeur,
+    // sans dépendre d'un appel de modèle.
+    const id = await createSite(request);
+
+    await page.route("**/api/generate", (route) =>
+      route.fulfill({
+        status: 201,
         contentType: "application/json",
-        body: JSON.stringify({ spec }),
-      });
-    });
+        body: JSON.stringify({ id, spec: MINIMAL_SPEC }),
+      }),
+    );
 
     await page.goto("/");
     await page.getByLabel("Le brief").fill("Une torréfaction artisanale à Bordeaux.");
     await page.getByRole("button", { name: "Générer le site" }).click();
 
+    await expect(page).toHaveURL(new RegExp(`/site/${id}/editer$`));
     await expect(
-      page.getByRole("heading", { name: /Torréfié à Bordeaux/ }),
+      page.getByRole("button", { name: "Enregistrer" }),
     ).toBeVisible();
-    await expect(page.getByText("Aperçu —")).toBeVisible();
-
-    await page.getByRole("button", { name: "Nouveau brief" }).click();
-    await expect(page.getByLabel("Le brief")).toBeVisible();
+    // Le site est bien celui qui vient d'être créé, pas un rendu de secours.
+    await expect(
+      page.getByRole("heading", { name: /Torréfié le mardi/ }),
+    ).toBeVisible();
   });
 });

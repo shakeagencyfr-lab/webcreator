@@ -1,9 +1,9 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { SiteRenderer } from "@/components/site/SiteRenderer";
 import { MAX_BRIEF_LENGTH } from "@/lib/generate/limits";
-import type { SiteSpec } from "@/lib/site/schema";
 
 type Status = "idle" | "loading" | "error";
 
@@ -14,10 +14,10 @@ const EXAMPLES = [
 ];
 
 export function Generator({ configured }: { configured: boolean }) {
+  const router = useRouter();
   const [brief, setBrief] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [spec, setSpec] = useState<SiteSpec | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   async function submit(event: React.FormEvent) {
@@ -39,32 +39,13 @@ export function Generator({ configured }: { configured: boolean }) {
         return;
       }
 
-      setSpec(data.spec);
-      setStatus("idle");
+      // Le statut reste « loading » : la navigation suit, et réactiver le
+      // formulaire ferait clignoter un bouton qu'on s'apprête à quitter.
+      router.push(`/site/${data.id}/editer`);
     } catch {
       setError("Impossible de joindre le serveur.");
       setStatus("error");
     }
-  }
-
-  if (spec) {
-    return (
-      <div className="flex min-h-full flex-col">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-app-border bg-app-surface px-5 py-3">
-          <p className="text-sm text-app-muted">
-            Aperçu — <span className="text-app-text">{spec.name}</span>
-          </p>
-          <button
-            type="button"
-            onClick={() => setSpec(null)}
-            className="inline-flex min-h-11 items-center rounded-md border border-app-border px-4 text-sm font-medium text-app-text transition-transform duration-[160ms] ease-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-app-accent"
-          >
-            Nouveau brief
-          </button>
-        </div>
-        <SiteRenderer spec={spec} />
-      </div>
-    );
   }
 
   const loading = status === "loading";
@@ -72,9 +53,17 @@ export function Generator({ configured }: { configured: boolean }) {
 
   return (
     <main className="mx-auto w-full max-w-2xl grow px-5 py-16 sm:py-24">
-      <h1 className="text-[clamp(2rem,5vw,3rem)] leading-tight font-semibold text-balance">
-        Décris un site. Obtiens une page.
-      </h1>
+      <div className="flex flex-wrap items-baseline justify-between gap-4">
+        <h1 className="text-[clamp(2rem,5vw,3rem)] leading-tight font-semibold tracking-[-0.02em] text-balance">
+          Décris un site. Obtiens une page.
+        </h1>
+        <Link
+          href="/sites"
+          className="text-sm text-app-accent underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-app-accent"
+        >
+          Mes sites
+        </Link>
+      </div>
       <p className="mt-5 max-w-[58ch] leading-relaxed text-app-muted">
         Le modèle écrit le contenu et choisit la direction visuelle. La mise en
         page, les états et l&apos;accessibilité sont déjà tenus par le moteur de

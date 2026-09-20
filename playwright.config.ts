@@ -56,5 +56,10 @@ export default defineConfig({
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    /*
+      Base séparée : les tests créent des sites à chaque exécution, et ils
+      n'ont rien à faire dans celle de développement.
+    */
+    env: { WEBCREATOR_DB: process.env.WEBCREATOR_DB ?? "data/test.db" },
   },
 });

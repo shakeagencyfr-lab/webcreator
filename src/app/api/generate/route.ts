@@ -1,7 +1,12 @@
 import { GenerationError, generateSite } from "@/lib/generate";
+import { createSite } from "@/lib/store/sites";
 
 /**
- * POST /api/generate — { brief: string } → { spec: SiteSpec }
+ * POST /api/generate — { brief: string } → { id, spec }
+ *
+ * Le spec est persisté avant d'être renvoyé : une génération coûte un appel de
+ * modèle, la perdre au rechargement de l'onglet serait la payer deux fois.
+ * L'identifiant renvoyé est l'URL durable du site.
  *
  * La génération appelle un modèle et n'est jamais mise en cache : elle vit
  * dans un Route Handler POST, que Next ne met pas en cache par défaut.
@@ -31,7 +36,8 @@ export async function POST(request: Request) {
 
   try {
     const spec = await generateSite(brief);
-    return Response.json({ spec });
+    const site = createSite(spec);
+    return Response.json({ id: site.id, spec: site.spec }, { status: 201 });
   } catch (error) {
     if (error instanceof GenerationError) {
       return Response.json({ error: error.message }, { status: error.status });

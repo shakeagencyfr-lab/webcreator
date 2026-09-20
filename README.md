@@ -31,9 +31,9 @@ Le générateur ne demande jamais de HTML ni de CSS au modèle. Il lui demande u
 visuelle. Un moteur de rendu déterministe transforme ensuite ce spec en React.
 
 ```
-brief ──▶ Claude ──▶ spec (JSON) ──▶ validation ──▶ SiteRenderer ──▶ page
-                                      ├ schéma strict
-                                      └ audit de contraste
+brief ──▶ Claude ──▶ spec (JSON) ──▶ validation ──▶ stockage ──▶ /site/<id>
+                                      ├ schéma strict          │
+                                      └ audit de contraste     └▶ /site/<id>/editer
 ```
 
 Trois conséquences :
@@ -45,8 +45,9 @@ Trois conséquences :
   la typographie, la palette et la densité ; le reste ne bouge pas.
 - **Rien d'exécutable ne vient du modèle.** Aucune chaîne produite par
   l'inférence n'est évaluée ni injectée en HTML brut.
-- **Un spec se modifie.** Changer de thème ou réordonner des sections ne
-  redemande rien au modèle et ne coûte rien.
+- **Un spec se modifie.** Changer de thème, réécrire un titre ou réordonner
+  des sections ne redemande rien au modèle et ne coûte rien. C'est ce qui rend
+  l'éditeur possible : l'aperçu se recompose à chaque frappe, sans réseau.
 
 ## Structure
 
@@ -58,6 +59,9 @@ src/
     theme.ts       thème → custom properties CSS, et audit de contraste WCAG
     fonts.ts       appairages typographiques proposés au modèle
     sample.ts      spec de démonstration, rendu sur /exemple
+    edit.ts        parcours des champs texte, déplacement et retrait de sections
+  lib/store/
+    sites.ts       persistance SQLite — le seul module à remplacer pour déployer
   lib/generate/
     limits.ts      bornes partagées client/serveur
     prompt.ts      prompt système : rédaction et direction, jamais de mise en page
@@ -68,10 +72,15 @@ src/
     sections.tsx   un composant par type de section
     SiteRenderer.tsx  spec → arbre React
   app/
-    page.tsx       l'outil
-    generator.tsx  le formulaire (composant client)
+    page.tsx       le formulaire
+    generator.tsx  sa partie client
+    sites/         la liste des sites enregistrés
+    site/[id]/     le site seul — l'URL qu'on partage
+    site/[id]/editer/  l'éditeur : contrôles à gauche, aperçu vivant à droite
     exemple/       rendu du spec de démonstration, sans appel de modèle
-    api/generate/  POST { brief } → { spec }
+    api/generate/  POST { brief } → { id, spec }
+    api/sites/     GET liste · POST { spec } → { id, spec }
+    api/sites/[id]/  GET · PUT { spec } · DELETE
 
 tests/
   helpers.ts       neutralisation des polices distantes, collecte d'erreurs
@@ -129,6 +138,41 @@ Une palette qui échoue fait échouer la génération avec une 422 : c'est le
 défaut le plus courant d'un générateur de sites, et le seul contrôle
 entièrement déterministe qu'on puisse lui opposer.
 
+## Persistance et édition
+
+Une génération coûte un appel de modèle : elle est enregistrée avant d'être
+renvoyée. Chaque site a une URL durable, `/site/<id>`, qui ne montre que le
+site — aucune interface de webcreator par-dessus, c'est le lien qu'on envoie.
+
+L'éditeur (`/site/<id>/editer`) expose la direction visuelle (typographie,
+angles, densité, les huit couleurs) et le contenu, avec l'aperçu à côté. Il
+n'a pas neuf formulaires sur mesure : `lib/site/edit.ts` parcourt le spec et
+expose chaque chaîne éditable adressée par son chemin, donc **ajouter un champ
+au schéma le rend éditable sans toucher à l'éditeur**.
+
+Deux règles qui se ressemblent mais s'opposent :
+
+- La **sortie du modèle** est rejetée si l'audit de contraste échoue. C'est une
+  machine tenue de respecter la consigne.
+- L'**édition humaine** n'est qu'avertie. Le problème s'affiche en direct, la
+  sauvegarde reste possible. Ce n'est pas la même chose de contraindre un
+  générateur et de contraindre quelqu'un qui édite son propre site.
+
+### Le stockage
+
+SQLite via `node:sqlite`, intégré à Node 22 : aucune dépendance, aucun service,
+et la sauvegarde consiste à copier `data/sites.db` (`WEBCREATOR_DB` pour
+changer de chemin).
+
+Deux limites à connaître **avant de mettre en ligne** :
+
+- **Ça suppose un disque persistant.** Sur une plateforme serverless (Vercel,
+  Netlify), le système de fichiers est éphémère. `lib/store/sites.ts` est le
+  seul module à réécrire — les appelants ne connaissent que ses fonctions.
+- **Il n'y a aucune authentification.** Qui connaît un identifiant peut lire,
+  modifier et supprimer le site. Les identifiants sont non devinables (50 bits
+  d'aléa), ce qui n'est pas une politique d'accès.
+
 ## Kit de design
 
 Le dépôt embarque trois skills Claude Code dans `.claude/skills/` et deux
@@ -136,9 +180,10 @@ commandes `/design` et `/polish`. Voir [DESIGN-KIT.md](./DESIGN-KIT.md).
 
 ## État
 
-Ce qui marche : génération, validation, rendu des neuf types de section,
-aperçu, audit de contraste.
+Ce qui marche : génération, validation, audit de contraste, rendu des neuf
+types de section, persistance, édition du contenu et de la direction visuelle,
+réordonnancement et suppression de sections.
 
-Ce qui n'existe pas encore : persistance (un spec vit dans l'état React de
-l'onglet et disparaît au rechargement), édition du spec après génération,
-export statique ou déploiement, multi-pages, comptes.
+Ce qui n'existe pas encore : authentification, export statique ou déploiement
+du site produit, multi-pages, images, ajout d'une section absente du spec
+initial, annulation.

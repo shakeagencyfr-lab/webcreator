@@ -44,12 +44,15 @@ jobs:
       # `npm run build` vient de tourner : en CI, playwright.config.ts sert le
       # build de production plutôt que le serveur de développement.
       - name: Tests
+        id: tests
         run: npm test
 
       # Sans ça, un échec ne laisse qu'un log : le rapport porte les captures,
-      # les traces et le détail de chaque assertion.
+      # les traces et le détail de chaque assertion. Conditionné à l'échec de
+      # cette étape précise — si la CI casse plus tôt, il n'y a pas de rapport
+      # à remonter et l'étape n'avertirait que d'un dossier absent.
       - name: Conserver le rapport en cas d'échec
-        if: failure()
+        if: failure() && steps.tests.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report

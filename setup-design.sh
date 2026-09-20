@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-# Shake Design Kit — installe les 3 skills de design pour Claude Code.
+# Shake Design Kit — complète l'installation des skills de design.
+#
+# emil-design-eng et impeccable sont déjà versionnés dans .claude/skills/ :
+# ce script n'installe QUE le troisième skill (design-taste-frontend).
+#
 # Usage : bash setup-design.sh   (depuis la racine du projet)
 
 set -u
@@ -10,13 +14,16 @@ ko()  { printf "\033[0;31m  ✗ %s\033[0m\n" "$1"; }
 
 command -v node >/dev/null 2>&1 || { ko "Node.js est requis (v18+)"; exit 1; }
 
-say "1/3 — emil-kowalski : motion & animations"
-npx -y skills add emilkowalski/skill && ok "emil-design-eng installé" || ko "échec (relance à la main)"
+say "Skills versionnés dans le dépôt"
+for s in emil-design-eng impeccable; do
+  if [ -f ".claude/skills/$s/SKILL.md" ]; then
+    ok "$s présent (aucune installation nécessaire)"
+  else
+    ko "$s manquant dans .claude/skills/ — vérifie ton checkout"
+  fi
+done
 
-say "2/3 — impeccable : playbook UI/UX (23 commandes)"
-npx -y impeccable install && ok "impeccable installé" || ko "échec (alternative : /plugin marketplace add pbakaus/impeccable)"
-
-say "3/3 — taste : anti-slop, références de design"
+say "taste : anti-slop, références de design"
 npx -y skills add https://github.com/Leonxlnx/taste-skill --skill "design-taste-frontend" \
   && ok "design-taste-frontend installé" || ko "échec (relance à la main)"
 
@@ -36,6 +43,9 @@ Terminé. Ensuite, dans Claude Code :
   /mcp                 → vérifie figma + playwright
   /design <ta demande> → lance le pipeline complet
   /polish <fichier>    → passe de finition sur l'existant
+
+N'installe PAS impeccable via npx ou /plugin : tu aurais deux copies
+du même playbook. La copie du dépôt fait foi.
 
 Figma : ouvre l'app desktop et active le serveur MCP
 (Préférences → Enable local MCP server) avant de t'en servir.

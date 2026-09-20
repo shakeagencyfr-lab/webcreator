@@ -70,7 +70,6 @@ const headerSchema = z.object({
 
 const heroSchema = z.object({
   type: z.literal("hero"),
-  eyebrow: z.string().max(60).nullable(),
   title: z.string().min(1).max(120),
   subtitle: z.string().max(280).nullable(),
   primaryCta: ctaSchema.nullable(),

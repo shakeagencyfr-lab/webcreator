@@ -63,7 +63,6 @@ const wirePlan = z.object({
 const wireSection = z.object({
   type: z.enum(sectionTypes),
   brand: z.string().nullable(),
-  eyebrow: z.string().nullable(),
   title: z.string().nullable(),
   subtitle: z.string().nullable(),
   body: z.string().nullable(),
@@ -144,7 +143,6 @@ function toSection(raw: WireSection): unknown | null {
       if (!raw.title?.trim()) return null;
       return {
         type: "hero",
-        eyebrow: clampOrNull(raw.eyebrow, 60),
         title: clamp(raw.title, 120),
         subtitle: clampOrNull(raw.subtitle ?? raw.body, 280),
         primaryCta: raw.primaryCta,

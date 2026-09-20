@@ -1,12 +1,5 @@
 import type { SectionOf } from "@/lib/site/types";
-import {
-  Button,
-  Container,
-  Eyebrow,
-  Heading,
-  Lede,
-  SectionShell,
-} from "./primitives";
+import { Button, Container, Heading, Lede, SectionShell } from "./primitives";
 
 /**
  * Un composant par type de section du SiteSpec.
@@ -57,7 +50,6 @@ export function Header({ section }: { section: SectionOf<"header"> }) {
 export function Hero({ section }: { section: SectionOf<"hero"> }) {
   return (
     <SectionShell>
-      {section.eyebrow && <Eyebrow>{section.eyebrow}</Eyebrow>}
       <Heading level={1}>{section.title}</Heading>
       {section.subtitle && <Lede>{section.subtitle}</Lede>}
 
@@ -104,7 +96,7 @@ export function Stats({ section }: { section: SectionOf<"stats"> }) {
           <div key={item.label}>
             <dt className="sr-only">{item.label}</dt>
             <dd>
-              <span className="block font-[family-name:var(--site-font-heading)] text-[clamp(2.5rem,6vw,3.75rem)] leading-none font-semibold text-[var(--site-text)]">
+              <span className="block font-[family-name:var(--site-font-heading)] text-[clamp(2.5rem,6vw,3.75rem)] leading-none font-semibold tabular-nums tracking-[-0.03em] text-[var(--site-text)]">
                 {item.value}
               </span>
               <span
@@ -174,7 +166,7 @@ export function Pricing({ section }: { section: SectionOf<"pricing"> }) {
                 Le prix peut être « 29 € » comme « Sur devis » : la taille
                 s'adapte pour qu'un libellé long n'écrase pas la grille.
               */}
-              <span className="font-[family-name:var(--site-font-heading)] text-[clamp(1.6rem,3.5vw,2.4rem)] leading-none font-semibold text-balance text-[var(--site-text)]">
+              <span className="font-[family-name:var(--site-font-heading)] text-[clamp(1.6rem,3.5vw,2.4rem)] leading-none font-semibold tabular-nums text-balance text-[var(--site-text)]">
                 {plan.price}
               </span>
               {plan.period && (
@@ -231,12 +223,19 @@ export function Faq({ section }: { section: SectionOf<"faq"> }) {
           >
             <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 font-medium text-[var(--site-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--site-accent)]">
               {item.question}
-              <span
+              {/* Icône dessinée : un « + » typographique dépend de la police
+                  et ne s'aligne avec rien. */}
+              <svg
                 aria-hidden="true"
-                className="shrink-0 text-[var(--site-accent)] transition-transform duration-[180ms] ease-out group-open:rotate-45"
+                viewBox="0 0 16 16"
+                className="size-4 shrink-0 text-[var(--site-accent)] transition-transform duration-[180ms] ease-out group-open:rotate-45"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
               >
-                +
-              </span>
+                <path d="M8 2.5v11M2.5 8h11" />
+              </svg>
             </summary>
             <p className="pb-6 leading-relaxed text-[var(--site-muted)]">
               {item.answer}

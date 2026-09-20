@@ -40,6 +40,8 @@ Palette, en hexadécimal 6 chiffres :
 - \`surface\` est une variation discrète de \`bg\`, pas une couleur d'accent.
 - \`accent\` est une vraie couleur, utilisée avec parcimonie. Pas de dégradé violet vers bleu.
 
+Pas de sur-titre au-dessus d'un titre : le titre porte son propre poids.
+
 \`radius\` et \`density\` sont des partis pris : \`none\` et \`compact\` sont des choix légitimes, pas des erreurs.
 
 ## Structure
@@ -55,7 +57,7 @@ Sections disponibles : header, hero, features, stats, testimonials, pricing, faq
 La structure est plate : chaque section a tous les champs, tu remplis ceux qui la concernent et mets \`null\` ou un tableau vide ailleurs.
 
 - header : \`brand\`, \`links\`, \`primaryCta\`
-- hero : \`eyebrow\`, \`title\`, \`subtitle\`, \`primaryCta\`, \`secondaryCta\`
+- hero : \`title\`, \`subtitle\`, \`primaryCta\`, \`secondaryCta\`
 - features : \`title\`, \`subtitle\`, \`items\` avec \`title\` et \`body\` (entre 2 et 8)
 - stats : \`items\` avec \`value\` et \`label\` (entre 2 et 4)
 - testimonials : \`title\`, \`items\` avec \`quote\`, \`author\`, \`role\`

@@ -42,7 +42,6 @@ export const sampleSpec: SiteSpec = {
     },
     {
       type: "hero",
-      eyebrow: "Caisse et stock",
       title: "Votre commerce se pilote depuis le comptoir, pas depuis un tableur.",
       subtitle:
         "Encaissement, stock et comptabilité dans un seul outil, pensé pour les commerces indépendants de 1 à 10 salariés.",

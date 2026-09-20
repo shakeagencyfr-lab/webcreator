@@ -71,7 +71,7 @@ export function SiteRenderer({ spec }: { spec: SiteSpec }) {
       <div
         lang={spec.lang}
         style={themeToCssVars(spec.theme)}
-        className="min-h-full bg-[var(--site-bg)] font-[family-name:var(--site-font-body)] text-[var(--site-text)] antialiased"
+        className="min-h-full bg-[var(--site-bg)] font-[family-name:var(--site-font-body)] text-[var(--site-text)] antialiased [&_::selection]:bg-[var(--site-accent)] [&_::selection]:text-[var(--site-bg)]"
       >
         {spec.sections.map(renderSection)}
       </div>

@@ -44,14 +44,6 @@ export function SectionShell({
   );
 }
 
-export function Eyebrow({ children }: { children: ReactNode }) {
-  return (
-    <p className="mb-4 text-sm font-semibold tracking-[0.14em] uppercase text-[var(--site-accent)]">
-      {children}
-    </p>
-  );
-}
-
 export function Heading({
   children,
   level = 2,
@@ -62,9 +54,9 @@ export function Heading({
   const Tag = `h${level}` as const;
   const size =
     level === 1
-      ? "text-[clamp(2.25rem,6vw,4rem)] leading-[1.05]"
+      ? "text-[clamp(2.25rem,6vw,4rem)] leading-[1.05] tracking-[-0.03em]"
       : level === 2
-        ? "text-[clamp(1.75rem,4vw,2.75rem)] leading-[1.1]"
+        ? "text-[clamp(1.75rem,4vw,2.75rem)] leading-[1.1] tracking-[-0.02em]"
         : "text-[clamp(1.1rem,2vw,1.35rem)] leading-[1.25]";
 
   return (
@@ -78,7 +70,7 @@ export function Heading({
 
 export function Lede({ children }: { children: ReactNode }) {
   return (
-    <p className="mt-5 max-w-[60ch] text-[clamp(1rem,1.6vw,1.2rem)] leading-relaxed text-[var(--site-muted)]">
+    <p className="mt-5 max-w-[68ch] text-[clamp(1rem,1.6vw,1.2rem)] leading-relaxed text-[var(--site-muted)]">
       {children}
     </p>
   );

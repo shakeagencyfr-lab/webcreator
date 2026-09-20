@@ -122,7 +122,7 @@ export function Generator({ configured }: { configured: boolean }) {
           rows={7}
           disabled={loading}
           aria-describedby="brief-count"
-          className="mt-3 w-full resize-y rounded-md border border-app-border bg-app-surface p-4 leading-relaxed text-app-text placeholder:text-app-muted/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-app-accent disabled:opacity-60"
+          className="mt-3 w-full resize-y rounded-md border border-app-border bg-app-surface p-4 leading-relaxed text-app-text placeholder:text-app-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-app-accent disabled:opacity-60"
           placeholder="Une torréfaction artisanale à Bordeaux qui vend en ligne et forme les baristas…"
         />
 

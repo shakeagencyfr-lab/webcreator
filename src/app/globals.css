@@ -40,6 +40,22 @@ body {
 }
 
 /*
+  Surfaces que le navigateur dessine et qu'aucun design system ne couvre par
+  défaut : sélection de texte, curseur de saisie, contrôles natifs. Les laisser
+  aux valeurs du navigateur est le signe le plus courant d'une page assemblée
+  plutôt que construite.
+*/
+::selection {
+  background: var(--app-accent);
+  color: var(--app-accent-text);
+}
+
+:root {
+  accent-color: var(--app-accent);
+  caret-color: var(--app-accent);
+}
+
+/*
   Réduire le mouvement, pas le supprimer : les transitions d'opacité et de
   couleur aident à comprendre ce qui change, seuls les déplacements gênent.
 */

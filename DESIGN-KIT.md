@@ -61,28 +61,63 @@ fait foi.
 ## Les deux connecteurs
 
 `.mcp.json` est en scope projet : au prochain lancement, Claude Code demande
-ton autorisation pour les deux serveurs. Réponds oui.
+ton autorisation pour les deux serveurs.
 
-**Figma** — le kit pointe sur le serveur local de l'app desktop
-(`http://127.0.0.1:3845/mcp`). Il faut que Figma soit ouvert et que le serveur MCP
-soit activé dans les préférences. Pour la version distante, remplace l'entrée par :
+### Ce qui change entre local et distant
+
+Ces connecteurs ne se comportent pas pareil selon l'endroit où tourne
+Claude Code. Le tableau vaut mieux qu'une supposition :
+
+| | Sur ta machine | Session distante (claude.ai/code) |
+|---|---|---|
+| **Figma** | `.mcp.json` pointe le serveur local de l'app desktop | `.mcp.json` ne sert à rien — rien n'écoute sur `127.0.0.1` dans le conteneur. Figma arrive par le **connecteur de compte**, indépendamment de ce dépôt |
+| **Playwright** | démarre via `npx` au lancement | ne démarre pas ; un serveur MCP ne s'ajoute pas en cours de session |
+
+**Figma.** En local, il faut que l'app desktop soit ouverte et que le serveur
+MCP soit activé (Préférences → Enable local MCP server). Pour t'en servir
+depuis n'importe où sans l'app desktop, remplace l'entrée par le serveur
+distant, puis authentifie-toi avec `/mcp` :
 
 ```json
 "figma": { "type": "http", "url": "https://mcp.figma.com/mcp" }
 ```
 
-puis authentifie-toi avec `/mcp`.
+Ne fais pas les deux en même temps : tu aurais deux serveurs Figma concurrents.
+Vérifie ton accès avec l'outil `whoami` — il renvoie ton siège, et un siège
+**View** ne permet pas d'écrire dans un fichier Figma.
 
-**Playwright** — se lance tout seul via `npx`, aucune installation préalable.
-Premier lancement un peu long (téléchargement du navigateur).
+**Playwright.** Premier lancement long (téléchargement du navigateur). Si le
+navigateur téléchargé ne correspond pas à celui de l'environnement — cas des
+conteneurs qui en embarquent déjà un —, pointe l'exécutable explicitement :
+
+```json
+"args": ["-y", "@playwright/mcp@latest", "--headless", "--isolated",
+         "--executable-path", "/opt/pw-browsers/chromium"]
+```
+
+### Vérification navigateur sans MCP
+
+Le MCP Playwright n'est pas indispensable : `npm run shots` fait le contrôle
+que `/design` et `/polish` demandent, et n'a besoin d'aucun connecteur.
+
+```bash
+npm run dev          # dans un terminal
+npm run shots        # dans un autre
+```
+
+Il capture chaque page en 1440 et 390 px dans `.screenshots/`, et signale les
+débordements horizontaux et les erreurs console — ce qu'une capture seule ne
+montre pas. Il sort en code 1 si quelque chose cloche, donc il s'intègre à une
+CI. Il utilise `PLAYWRIGHT_EXECUTABLE_PATH` s'il est défini, sinon le Chromium
+de l'image, sinon celui de Playwright.
 
 ## Premier run
 
 ```
 /impeccable init          → génère PRODUCT.md et DESIGN.md
-/mcp                      → vérifie que figma et playwright sont connectés
+/mcp                      → vérifie quels connecteurs sont réellement actifs
 /design une landing page pour Booster Commerçant Pro
-/polish app/page.tsx
+/polish src/components/site/
 ```
 
 ## Dépannage
@@ -93,5 +128,8 @@ Premier lancement un peu long (téléchargement du navigateur).
   désactivé dans les préférences.
 - **Playwright timeout au premier appel** → laisse-le finir le téléchargement
   du navigateur, puis relance.
+- **Aucun outil Playwright dans la session** → le serveur n'a pas démarré au
+  lancement, et il ne s'ajoute pas à chaud : relance Claude Code. En attendant,
+  `npm run shots` fait le même contrôle.
 - **Doublon de skill** → n'installe pas la copie du dépôt *et* le plugin ou la
   version npx, tu aurais deux copies du même playbook.

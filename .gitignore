@@ -42,3 +42,6 @@ next-env.d.ts
 
 # ...mais l'exemple de configuration est versionné.
 !.env.example
+
+# Captures de vérification navigateur
+/.screenshots/

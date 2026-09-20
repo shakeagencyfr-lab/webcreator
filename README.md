@@ -20,6 +20,7 @@ démonstration et `/api/generate` répond une 503 explicite.
 | `npm run build` | build de production (valide aussi les types) |
 | `npm run typecheck` | `tsc --noEmit` seul |
 | `npm run lint` | ESLint |
+| `npm run shots` | captures 1440/390 px + contrôle débordement et console (serveur de dev requis) |
 
 ## L'idée centrale : le modèle ne produit pas de code
 

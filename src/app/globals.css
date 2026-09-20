@@ -1,26 +1,55 @@
 @import "tailwindcss";
 
+/*
+  Tokens de l'outil lui-même.
+
+  À ne pas confondre avec les `--site-*` posés par `themeToCssVars` : ceux-ci
+  habillent webcreator, ceux-là habillent le site généré. Les deux jeux
+  cohabitent sur la même page pendant l'aperçu, d'où les préfixes distincts.
+
+  Neutres teintés froid, un seul accent. Pas de gris purs.
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --app-bg: #0e1116;
+  --app-surface: #161b22;
+  --app-raised: #1d232c;
+  --app-text: #e8ecf1;
+  --app-muted: #9aa5b4;
+  --app-border: #2a323d;
+  --app-accent: #5eead4;
+  --app-accent-text: #0e1116;
+  --app-danger: #fda4a4;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-app-bg: var(--app-bg);
+  --color-app-surface: var(--app-surface);
+  --color-app-raised: var(--app-raised);
+  --color-app-text: var(--app-text);
+  --color-app-muted: var(--app-muted);
+  --color-app-border: var(--app-border);
+  --color-app-accent: var(--app-accent);
+  --color-app-accent-text: var(--app-accent-text);
+  --color-app-danger: var(--app-danger);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--app-bg);
+  color: var(--app-text);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+  Réduire le mouvement, pas le supprimer : les transitions d'opacité et de
+  couleur aident à comprendre ce qui change, seuls les déplacements gênent.
+*/
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

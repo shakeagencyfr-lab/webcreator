@@ -1,0 +1,10 @@
+/*
+  Feuille de style des sites exportés.
+
+  `source(none)` coupe la détection automatique : seules les classes
+  réellement présentes dans le moteur de rendu sont compilées. L'export ne
+  transporte donc pas le CSS de l'outil, et reste la même source de vérité que
+  l'aperçu — il n'y a pas deux design systems à tenir.
+*/
+@import "tailwindcss" source(none);
+@source "../components/site";

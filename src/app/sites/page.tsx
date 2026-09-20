@@ -74,6 +74,13 @@ export default function SitesPage() {
                 >
                   Voir
                 </Link>
+                <a
+                  href={`/api/sites/${site.id}/export`}
+                  download
+                  className="inline-flex min-h-11 items-center rounded-md border border-app-border px-4 text-sm font-medium text-app-text transition-transform duration-[160ms] ease-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-app-accent"
+                >
+                  Exporter
+                </a>
                 <Link
                   href={`/site/${site.id}/editer`}
                   className="inline-flex min-h-11 items-center rounded-md bg-app-accent px-4 text-sm font-semibold text-app-accent-text transition-transform duration-[160ms] ease-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-app-accent"

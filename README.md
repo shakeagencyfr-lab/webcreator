@@ -20,6 +20,7 @@ démonstration et `/api/generate` répond une 503 explicite.
 | `npm run build` | build de production (valide aussi les types) |
 | `npm run typecheck` | `tsc --noEmit` seul |
 | `npm run lint` | ESLint |
+| `npm run build:css` | recompile la feuille de style d'export (déclenché par `dev` et `build`) |
 | `npm test` | suite Playwright, desktop et mobile |
 | `npm run test:ui` | la même en mode interactif |
 | `npm run shots` | captures pleine page dans `.screenshots/` |
@@ -62,6 +63,8 @@ src/
     edit.ts        parcours des champs texte, déplacement et retrait de sections
   lib/store/
     sites.ts       persistance SQLite — le seul module à remplacer pour déployer
+  lib/export/
+    html.ts        spec → document HTML autonome
   lib/generate/
     limits.ts      bornes partagées client/serveur
     prompt.ts      prompt système : rédaction et direction, jamais de mise en page
@@ -81,6 +84,7 @@ src/
     api/generate/  POST { brief } → { id, spec }
     api/sites/     GET liste · POST { spec } → { id, spec }
     api/sites/[id]/  GET · PUT { spec } · DELETE
+    api/sites/[id]/export/  GET → un fichier HTML autonome
 
 tests/
   helpers.ts       neutralisation des polices distantes, collecte d'erreurs
@@ -173,6 +177,27 @@ Deux limites à connaître **avant de mettre en ligne** :
   modifier et supprimer le site. Les identifiants sont non devinables (50 bits
   d'aléa), ce qui n'est pas une politique d'accès.
 
+## L'export
+
+`/api/sites/<id>/export` renvoie **un seul fichier HTML**, qu'on ouvre par un
+double-clic ou qu'on dépose tel quel sur n'importe quel hébergement. Pas de
+JavaScript, pas de build, aucune dépendance à webcreator. La seule ressource
+externe est Google Fonts, et le site reste lisible sans elle grâce aux piles
+de repli.
+
+Le balisage vient du **même moteur de rendu que l'aperçu** : il n'y a pas deux
+implémentations à garder synchronisées, ce qu'on voit est ce qu'on exporte.
+
+Le CSS est le point délicat. Les composants utilisent Tailwind, et un fichier
+autonome ne peut pas pointer sur le bundle de l'application. `npm run build:css`
+compile `src/styles/site-export.css` — qui, via `source(none)` et un `@source`
+pointé sur `src/components/site`, ne retient que les classes réellement
+présentes dans le moteur de rendu. Résultat : 13 Ko, sans une ligne du CSS de
+l'outil. Le script tourne automatiquement avant `dev` et avant `build`.
+
+L'export porte la **dernière version enregistrée**, pas les modifications en
+cours dans l'éditeur.
+
 ## Kit de design
 
 Le dépôt embarque trois skills Claude Code dans `.claude/skills/` et deux
@@ -182,8 +207,8 @@ commandes `/design` et `/polish`. Voir [DESIGN-KIT.md](./DESIGN-KIT.md).
 
 Ce qui marche : génération, validation, audit de contraste, rendu des neuf
 types de section, persistance, édition du contenu et de la direction visuelle,
-réordonnancement et suppression de sections.
+réordonnancement et suppression de sections, export HTML autonome.
 
-Ce qui n'existe pas encore : authentification, export statique ou déploiement
-du site produit, multi-pages, images, ajout d'une section absente du spec
-initial, annulation.
+Ce qui n'existe pas encore : authentification, déploiement du site produit
+(l'export se dépose à la main), multi-pages, images, ajout d'une section
+absente du spec initial, annulation.

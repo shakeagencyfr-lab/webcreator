@@ -50,6 +50,25 @@ function renderSection(section: Section, index: number) {
   }
 }
 
+/**
+ * Le site lui-même : le conteneur thémé et ses sections.
+ *
+ * Séparé de `SiteRenderer` parce que l'export autonome a besoin de ce corps
+ * seul — les liens de police y vont dans le `<head>` du document, pas au fil
+ * du balisage.
+ */
+export function SiteBody({ spec }: { spec: SiteSpec }) {
+  return (
+    <div
+      lang={spec.lang}
+      style={themeToCssVars(spec.theme)}
+      className="min-h-full bg-[var(--site-bg)] font-[family-name:var(--site-font-body)] text-[var(--site-text)] antialiased [&_::selection]:bg-[var(--site-accent)] [&_::selection]:text-[var(--site-bg)]"
+    >
+      {spec.sections.map(renderSection)}
+    </div>
+  );
+}
+
 export function SiteRenderer({ spec }: { spec: SiteSpec }) {
   const fonts = FONT_PAIRINGS[spec.theme.fontPairing];
 
@@ -68,13 +87,7 @@ export function SiteRenderer({ spec }: { spec: SiteSpec }) {
       />
       <link rel="stylesheet" href={fonts.googleHref} />
 
-      <div
-        lang={spec.lang}
-        style={themeToCssVars(spec.theme)}
-        className="min-h-full bg-[var(--site-bg)] font-[family-name:var(--site-font-body)] text-[var(--site-text)] antialiased [&_::selection]:bg-[var(--site-accent)] [&_::selection]:text-[var(--site-bg)]"
-      >
-        {spec.sections.map(renderSection)}
-      </div>
+      <SiteBody spec={spec} />
     </>
   );
 }

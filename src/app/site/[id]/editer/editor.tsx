@@ -135,6 +135,24 @@ export function Editor({ id, initialSpec }: { id: string; initialSpec: SiteSpec 
             Voir le site
           </Link>
 
+          {/*
+            Un <a> ordinaire, pas un fetch : le navigateur sait télécharger un
+            fichier, et l'export est celui du site enregistré — pas des
+            modifications en cours, d'où l'avertissement quand il y en a.
+          */}
+          <a
+            href={`/api/sites/${id}/export`}
+            download
+            title={
+              save.status === "dirty"
+                ? "L'export porte la dernière version enregistrée"
+                : undefined
+            }
+            className="inline-flex min-h-11 items-center rounded-md border border-app-border px-4 text-sm font-medium text-app-text transition-transform duration-[160ms] ease-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-app-accent"
+          >
+            Exporter
+          </a>
+
           <button
             type="button"
             onClick={persist}

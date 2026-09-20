@@ -56,3 +56,6 @@ node_modules/
 
 # Base SQLite locale
 /data/
+
+# Feuille de style d’export, générée par npm run build:css
+/public/site-export.css

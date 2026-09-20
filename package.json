@@ -10,7 +10,10 @@
     "typecheck": "next typegen && tsc --noEmit",
     "shots": "playwright test --grep @capture",
     "test": "playwright test",
-    "test:ui": "playwright test --ui"
+    "test:ui": "playwright test --ui",
+    "build:css": "tailwindcss -i src/styles/site-export.css -o public/site-export.css --minify",
+    "prebuild": "npm run build:css",
+    "predev": "npm run build:css"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.127.0",
@@ -22,6 +25,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
+    "@tailwindcss/cli": "^4.3.3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^22.20.4",
     "@types/react": "^19",
